@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to Investment Portfolios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The SPA is designed as a guided learning journey. It starts with an introduction, then moves to "Building Blocks" (interactive cards for asset types), followed by "Why Invest?" (key benefits). The centerpiece is an interactive "Portfolio Explorer" where users answer questions to see a dynamic Chart.js donut chart reflecting their risk profile. It concludes with "Core Principles" (accordion-style info) and a "Getting Started" guide. This task-oriented flow transforms the report's dense text into an engaging, step-by-step discovery process, prioritizing user interaction and understanding over a linear report structure. -->
+    <!-- Visualization & Content Choices: 1. Asset Types: Report Info -> Asset descriptions. Goal -> Inform/Compare. Viz -> Interactive HTML cards. Interaction -> Click to reveal details. Justification -> More engaging than a static table. 2. Portfolio Allocation: Report Info -> Portfolio types (Aggressive, Moderate, etc.). Goal -> Relate/Inform. Viz -> Dynamic Donut Chart (Chart.js/Canvas). Interaction -> User selects risk tolerance, chart updates. Justification -> Makes abstract asset allocation tangible and personal. 3. Risk vs. Return: Report Info -> Historical asset performance. Goal -> Compare. Viz -> Horizontal Bar Chart (Chart.js/Canvas). Justification -> Clear, immediate comparison of asset classes. 4. Getting Started: Report Info -> Steps to build a portfolio. Goal -> Organize. Viz -> Numbered list with icons (HTML/CSS). Justification -> Simple, clear, process-oriented view. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 450px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
+        .nav-link.active { color: #2563eb; border-bottom-color: #2563eb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-2xl font-bold text-blue-600">Portfolio<span class="text-gray-700">Wise</span></div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#intro" class="nav-link text-gray-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Introduction</a>
+                    <a href="#blocks" class="nav-link text-gray-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Building Blocks</a>
+                    <a href="#explorer" class="nav-link text-gray-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Portfolio Explorer</a>
+                    <a href="#principles" class="nav-link text-gray-600 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Core Principles</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        
+        <!-- Section 1: Introduction -->
+        <section id="intro" class="text-center mb-20">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">What is an Investment Portfolio?</h1>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600">Think of a portfolio not as a physical thing, but as a concept—a collection of all your financial assets. It's the strategic way you organize investments like stocks, bonds, and cash to grow your wealth and achieve your financial dreams, from retirement to buying a home.</p>
+        </section>
+
+        <!-- Section 2: Building Blocks -->
+        <section id="blocks" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-2">The Building Blocks of a Portfolio</h2>
+            <p class="text-center text-gray-600 mb-12">Every strong portfolio is built from a mix of different assets. Click on each block to learn about its role.</p>
+            <div id="asset-cards" class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            </div>
+        </section>
+
+        <!-- Section 3: Why Invest? -->
+        <section id="why" class="bg-white rounded-xl shadow p-8 md:p-12 mb-20">
+            <h2 class="text-3xl font-bold text-center mb-12">Why Bother? The Core Benefits</h2>
+            <div class="grid md:grid-cols-3 gap-10 text-center">
+                <div class="flex flex-col items-center">
+                    <div class="bg-blue-100 text-blue-600 rounded-full p-4 mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Accelerate Wealth Growth</h3>
+                    <p class="text-gray-600">A smart mix of investments can grow your money much faster than a savings account, thanks to the power of compounding.</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="bg-green-100 text-green-600 rounded-full p-4 mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1h4v1h-4zm-2 10v-1h4v1h-4z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Beat Inflation</h3>
+                    <p class="text-gray-600">Inflation silently eats away at your savings. Investing helps your money's purchasing power grow, not shrink, over time.</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="bg-purple-100 text-purple-600 rounded-full p-4 mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Achieve Your Goals</h3>
+                    <p class="text-gray-600">Whether it's for retirement, education, or a dream vacation, investing makes it more likely you'll reach your financial targets.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Portfolio Explorer -->
+        <section id="explorer" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-2">Interactive Portfolio Explorer</h2>
+            <p class="text-center text-gray-600 mb-12">Your ideal portfolio depends on your goals and how much risk you're comfortable with. Answer the question below to see a sample allocation.</p>
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden md:flex">
+                <div class="md:w-1/2 p-8 lg:p-12">
+                    <h3 class="font-bold text-2xl mb-6">Find Your Style</h3>
+                    <div class="space-y-4" id="risk-form">
+                        <label class="font-semibold text-gray-700">Which statement best describes you?</label>
+                        <div>
+                            <input type="radio" id="risk-low" name="riskTolerance" value="conservative" class="hidden peer">
+                            <label for="risk-low" class="block cursor-pointer p-4 border rounded-lg peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200">
+                                <span class="font-bold">Cautious Captain:</span> "I prioritize protecting my money over high growth. I prefer stability."
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="risk-medium" name="riskTolerance" value="moderate" class="hidden peer" checked>
+                             <label for="risk-medium" class="block cursor-pointer p-4 border rounded-lg peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200">
+                                <span class="font-bold">Balanced Navigator:</span> "I'm looking for a mix of safety and growth. I can handle some ups and downs."
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="risk-high" name="riskTolerance" value="aggressive" class="hidden peer">
+                            <label for="risk-high" class="block cursor-pointer p-4 border rounded-lg peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200">
+                                <span class="font-bold">Growth Seeker:</span> "I'm aiming for maximum growth over the long term and I'm okay with significant market swings."
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 bg-gray-50 p-8 flex flex-col justify-center items-center">
+                    <div class="chart-container">
+                        <canvas id="portfolioChart"></canvas>
+                    </div>
+                    <div id="portfolio-description" class="text-center mt-4">
+                        <h4 class="text-xl font-bold text-gray-800"></h4>
+                        <p class="text-gray-600"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Core Principles -->
+        <section id="principles" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-12">Core Principles of Smart Investing</h2>
+            <div class="max-w-3xl mx-auto space-y-4" id="accordion">
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>PortfolioWise | An Interactive Educational Tool</p>
+            <p class="text-sm text-gray-400 mt-2">This information is for educational purposes only and not financial advice.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const assetsData = [
+                { name: 'Stocks', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6', color: 'blue', description: 'Represents ownership in a company. Offers high growth potential but comes with higher risk and volatility. Ideal for long-term wealth building.' },
+                { name: 'Bonds', icon: 'M9 8h6m-5 4h4m2 4h-4M4 4h16v16H4z', color: 'green', description: 'Essentially a loan to a company or government that pays you interest. Generally safer than stocks, providing stability and income.' },
+                { name: 'Cash & Equivalents', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z', color: 'yellow', description: 'The most liquid and safe part of a portfolio. Includes savings accounts and money market funds. Crucial for emergencies but offers low returns.' },
+                { name: 'Pooled Investments', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', color: 'purple', description: 'Mutual Funds & ETFs. These are pre-packaged collections of stocks and bonds, offering instant diversification and professional management.' }
+            ];
+
+            const assetCardsContainer = document.getElementById('asset-cards');
+            assetsData.forEach(asset => {
+                const card = `
+                    <div class="card bg-white rounded-xl shadow p-6 cursor-pointer text-center">
+                        <div class="flex justify-center mb-4">
+                            <div class="bg-${asset.color}-100 text-${asset.color}-600 rounded-full p-3">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${asset.icon}"></path></svg>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">${asset.name}</h3>
+                        <p class="text-gray-600">${asset.description}</p>
+                    </div>
+                `;
+                assetCardsContainer.innerHTML += card;
+            });
+
+            const principlesData = [
+                { title: 'Risk vs. Return', content: 'A core concept: higher potential returns usually come with higher risk. Understanding this trade-off is key to choosing investments that match your comfort level. Historically, stocks have offered higher returns than bonds or cash over the long run, but with more ups and downs.' },
+                { title: 'Diversification', content: '"Don\'t put all your eggs in one basket." Spreading your investments across different asset classes (stocks, bonds, etc.) and within those classes (different industries, countries) helps cushion your portfolio against market shocks. If one area does poorly, others may do well.' },
+                { title: 'Asset Allocation', content: 'This is the strategic mix of assets in your portfolio. It\'s the most important decision you\'ll make, as it\'s driven by your goals, time horizon, and risk tolerance. A young investor might have more stocks, while a retiree will have more bonds.' },
+                { title: 'Rebalancing', content: 'Over time, your portfolio\'s mix will drift as some investments grow faster than others. Rebalancing means periodically buying or selling assets to get back to your original target allocation. This enforces a "buy low, sell high" discipline.' }
+            ];
+
+            const accordionContainer = document.getElementById('accordion');
+            principlesData.forEach((item, index) => {
+                const accordionItem = `
+                    <div class="border rounded-lg bg-white overflow-hidden">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg flex justify-between items-center hover:bg-gray-50 transition" data-index="${index}">
+                            <span>${item.title}</span>
+                            <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="accordion-content px-4 pb-4 text-gray-600">
+                           ${item.content}
+                        </div>
+                    </div>
+                `;
+                accordionContainer.innerHTML += accordionItem;
+            });
+            
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('svg');
+
+                    // Close all others
+                    document.querySelectorAll('.accordion-content').forEach(c => {
+                        if (c !== content) {
+                            c.style.maxHeight = null;
+                            c.previousElementSibling.querySelector('svg').classList.remove('rotate-180');
+                        }
+                    });
+
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.classList.remove('rotate-180');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.classList.add('rotate-180');
+                    }
+                });
+            });
+
+
+            const portfolioData = {
+                conservative: {
+                    labels: ['Bonds', 'Stocks', 'Cash'],
+                    data: [70, 20, 10],
+                    colors: ['#22c55e', '#3b82f6', '#f59e0b'],
+                    title: 'Conservative Portfolio',
+                    description: 'Focuses on preserving capital with low risk. Ideal for those nearing retirement or with short-term goals.'
+                },
+                moderate: {
+                    labels: ['Stocks', 'Bonds', 'Cash'],
+                    data: [60, 35, 5],
+                    colors: ['#3b82f6', '#22c55e', '#f59e0b'],
+                    title: 'Moderate (Balanced) Portfolio',
+                    description: 'Aims for a blend of growth and stability. A popular choice for investors with a medium to long-term outlook.'
+                },
+                aggressive: {
+                    labels: ['Stocks', 'Bonds', 'Alternatives'],
+                    data: [85, 10, 5],
+                    colors: ['#3b82f6', '#22c55e', '#8b5cf6'],
+                    title: 'Aggressive Portfolio',
+                    description: 'Seeks to maximize long-term growth. Suited for investors with a long time horizon who can tolerate market swings.'
+                }
+            };
+
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            let portfolioChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [],
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            function updateChart(riskProfile) {
+                const data = portfolioData[riskProfile];
+                portfolioChart.data.labels = data.labels;
+                portfolioChart.data.datasets[0].data = data.data;
+                portfolioChart.data.datasets[0].backgroundColor = data.colors;
+                portfolioChart.update();
+
+                const descriptionContainer = document.getElementById('portfolio-description');
+                descriptionContainer.querySelector('h4').textContent = data.title;
+                descriptionContainer.querySelector('p').textContent = data.description;
+            }
+
+            document.getElementById('risk-form').addEventListener('change', (event) => {
+                if (event.target.name === 'riskTolerance') {
+                    updateChart(event.target.value);
+                }
+            });
+
+            updateChart('moderate');
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>
